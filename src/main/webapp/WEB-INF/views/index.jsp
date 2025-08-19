@@ -4,5 +4,6 @@
     </head>
     <body>
     Hello
+    <div id="content"></div>
     </body>
 </html>

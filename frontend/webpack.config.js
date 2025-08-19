@@ -7,4 +7,10 @@ mode: 'development',
     filename: 'cornerstone.js',
     path: path.resolve(__dirname, '..', 'src', 'main', 'webapp', 'static'),
   },
+  resolve: {
+    fallback: {
+        'fs' : false,
+        'path': require.resolve("path-browserify")
+    }
+  }
 };
