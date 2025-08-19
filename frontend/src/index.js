@@ -3,14 +3,21 @@ console.log("hello webpack - index.js");
 import { init as coreInit } from '@cornerstonejs/core';
 import { init as dicomImageLoaderInit } from '@cornerstonejs/dicom-image-loader';
 
-await coreInit();
-await dicomImageLoaderInit();
+async function initCornerstone() {
+    await coreInit();
+    await dicomImageLoaderInit();
+}
 
-const content = document.getElementById('content');
-const element = document.createElement('div');
+await initCornerstone();
 
-element.style.width = '500px';
-element.style.height = '500px';
-element.style.backgroundColor = 'purple';
+window.addEventListener("load", () => {
+    const content = document.getElementById('content');
+    const element = document.createElement('div');
 
-content.appendChild(element);
+    element.style.width = '500px';
+    element.style.height = '500px';
+    element.style.backgroundColor = 'purple';
+
+    content.appendChild(element);
+});
+
