@@ -12,7 +12,7 @@ description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -41,9 +41,9 @@ dependencies {
 // 2. Node.js 및 Webpack 설정
 node {
     // 프로젝트에서 사용할 Node.js 버전. 로컬에 없으면 자동으로 다운로드 및 설치됩니다.
-    version = '22.18.0'
+    version = '22.14.0'
     // npm 버전을 지정할 수도 있습니다.
-    npmVersion = '10.9.3'
+    npmVersion = '10.9.2'
     // true로 설정하면 시스템에 설치된 Node.js를 사용합니다.
     download = true
     // 프론트엔드 소스 코드가 있는 디렉토리

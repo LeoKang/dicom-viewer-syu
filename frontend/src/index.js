@@ -1,19 +1,13 @@
-console.log("hello webpack - index.js");
-
-import {Enums, init as coreInit, RenderingEngine } from '@cornerstonejs/core';
+import {Enums, init as coreInit, RenderingEngine} from '@cornerstonejs/core';
 import { init as dicomImageLoaderInit } from '@cornerstonejs/dicom-image-loader';
-import { init, Enums as toolsEnums } from '@cornerstonejs/tools';
+import { init, Enums as toolsEnums, ToolGroupManager } from '@cornerstonejs/tools';
 import * as csTools3d from '@cornerstonejs/tools';
-
 const { PanTool, ZoomTool, StackScrollTool, WindowLevelTool } = csTools3d;
-
-import { ToolGroupManager } from '@cornerstonejs/tools';
-
 
 async function initCornerstone() {
     await coreInit();
     await dicomImageLoaderInit();
-    init();
+    await init();
 }
 
 await initCornerstone();
@@ -38,41 +32,41 @@ window.addEventListener("load", () => {
         }
         reader.readAsArrayBuffer(file);
     });
+
 });
 
 function render(arrayBuffer, element) {
-    // create imageId
+    // Create ImageId
     const url = URL.createObjectURL(new Blob([arrayBuffer]), {type: "application/dicom"});
     const imageId = `dicomweb:${url}`;
-    console.log('imageid : ', imageId);
+    console.log('imageId : ', imageId);
 
     // Get Cornerstone imageIds and fetch metadata into RAM
-      const imageIds = [imageId];
+    const imageIds = [imageId];
 
-      const renderingEngineId = 'myRenderingEngine';
-      const renderingEngine = new RenderingEngine(renderingEngineId);
+    const renderingEngineId = 'myRenderingEngine';
+    const renderingEngine = new RenderingEngine(renderingEngineId);
 
-      const viewportId = 'CT_AXIAL_STACK';
+    const viewportId = 'CT_AXIAL_STACK';
 
-      const viewportInput = {
+    const viewportInput = {
         viewportId,
         element,
         type: Enums.ViewportType.STACK,
-      };
+    };
 
-      renderingEngine.enableElement(viewportInput);
+    renderingEngine.enableElement(viewportInput);
 
-      const viewport = renderingEngine.getViewport(viewportId);
+    const viewport = renderingEngine.getViewport(viewportId);
+    viewport.setStack(imageIds, 0);
 
-      viewport.setStack(imageIds, 0);
+    // 사용할 툴 등록
+    csTools3d.addTool(PanTool);
+    csTools3d.addTool(ZoomTool);
+    csTools3d.addTool(StackScrollTool);
+    csTools3d.addTool(WindowLevelTool);
 
-      // 사용할 툴 등록
-      csTools3d.addTool(PanTool);
-      csTools3d.addTool(ZoomTool);
-      csTools3d.addTool(StackScrollTool);
-      csTools3d.addTool(WindowLevelTool);
-
-    //뷰 포트에 연결할 그룹 생성
+    // 뷰 포트에 연결할 그룹 생성
     const toolGroupId = 'ctToolGroup';
     const ctToolGroup = ToolGroupManager.createToolGroup(toolGroupId);
 
@@ -83,25 +77,25 @@ function render(arrayBuffer, element) {
     ctToolGroup.addTool(StackScrollTool.toolName);
     ctToolGroup.addTool(WindowLevelTool.toolName);
 
-
+    // 생성한 툴 그룹에 1:1로 뷰포트 연결
     // Apply tool group to viewport or all viewports rendering a scene
-    //생성한 툴 그룹에 1:1로 뷰포트 연결
     ctToolGroup.addViewport(viewportId, renderingEngineId);
 
-// Set the ToolGroup's ToolMode for each tool
-// Possible modes include: 'Active', 'Passive', 'Enabled', 'Disabled'
-ctToolGroup.setToolActive(WindowLevelTool.toolName, {
-  bindings: [{ mouseButton: toolsEnums.MouseBindings.Primary }],
-});
-ctToolGroup.setToolActive(PanTool.toolName, {
-  bindings: [{ mouseButton: MouseBindings.Auxiliary }],
-  modifierKey: toolsEnums.keyboardBidings.Ctrl
-});
-ctToolGroup.setToolActive(ZoomTool.toolName, {
-  bindings: [{ mouseButton: MouseBindings.Secondary }],
-});
-ctToolGroup.setToolActive(StackScrollTool.toolName);
-
+    // 툴 활성화
+    // Set the ToolGroup's ToolMode for each tool
+    // Possible modes include: 'Active', 'Passive', 'Enabled', 'Disabled'
+    ctToolGroup.setToolActive(WindowLevelTool.toolName, {
+        bindings: [{ mouseButton: toolsEnums.MouseBindings.Primary }],
+    });
+    ctToolGroup.setToolActive(PanTool.toolName, {
+        bindings: [{ mouseButton: toolsEnums.MouseBindings.Primary,
+            modifierKey: toolsEnums.KeyboardBindings.Ctrl
+        }],
+    });
+    ctToolGroup.setToolActive(ZoomTool.toolName, {
+        bindings: [{ mouseButton: toolsEnums.MouseBindings.Secondary }],
+    });
+    ctToolGroup.setToolActive(StackScrollTool.toolName);
 
     viewport.render();
 }
